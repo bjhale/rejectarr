@@ -1,0 +1,30 @@
+rules:
+  - id: tv-shows
+    category: tv-shows
+    rulesets:
+      - exe
+      - archives
+      - cant-import
+
+rulesets:
+  - id: exe
+    action: reject
+    filePatterns:
+      - "*.exe"
+      - "*.msi"
+      - "*.bat"
+      - "*.cmd"
+      - "*.ps1"
+      - "*.scr"
+  - id: archives
+    action: reject
+    filePatterns:
+      - "*.zip"
+      - "*.rar"
+      - "*.7z"
+      - "*.tar"
+      - "*.gz"
+  - id: cant-import
+    action: reject
+    sonarrMessageRegex:
+      - ".*No files found are eligible for import.*"

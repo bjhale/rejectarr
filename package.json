@@ -3,13 +3,19 @@
   "module": "src/index.ts",
   "type": "module",
   "private": true,
+  "bin": {
+    "rejectarr": "src/index.ts"
+  },
   "scripts": {
-    "typecheck": "bun check"
+    "cli": "bun src/index.ts",
+    "typecheck": "bun check",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^7"
-  }
+  },
+  "packageManager": "pnpm@10.28.0"
 }
