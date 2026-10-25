@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { formatBytes, formatTable } from "./format";
+import { formatBytes, formatFields, formatTable, sanitize } from "./format";
 
 test("formatBytes", () => {
   expect(formatBytes(0)).toBe("0 B");
@@ -23,6 +23,18 @@ test("formatTable shrinks the flex column to fit maxWidth", () => {
 test("formatTable shrinks several flex columns widest-first", () => {
   const out = formatTable(["A", "B"], [["aaaaaaaaaa", "bbbbbb"]], { maxWidth: 12, flexColumns: [0, 1] });
   expect(out.split("\n")[2]).toBe("aaaa…  bbbb…");
+});
+
+test("sanitize replaces terminal escapes and bidi overrides", () => {
+  expect(sanitize("a\u001b[2Jb\u009bc")).toBe("a?[2Jb?c");
+  expect(sanitize("x‮vkm.exe")).toBe("x?vkm.exe");
+  expect(sanitize("line\nbreak")).toBe("line?break");
+  expect(sanitize("Show S01E01 – ünïcode.mkv")).toBe("Show S01E01 – ünïcode.mkv");
+});
+
+test("formatTable and formatFields sanitize what they print", () => {
+  expect(formatTable(["A"], [["x\u001b[31m"]]).split("\n")[2]).toBe("x?[31m");
+  expect(formatFields([["Name", "x‮vkm.exe"], ["Hash", "abc"]])).toBe("Name: x?vkm.exe\nHash: abc");
 });
 
 test("formatTable does not shrink the flex column below its header", () => {

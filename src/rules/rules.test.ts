@@ -21,6 +21,13 @@ describe("matchesPattern", () => {
     expect(matchesPattern("*.exe", "Show S01/Show.S01E01.mkv")).toBe(false);
   });
 
+  test("matches names disguised with trailing dots, spaces, or full-width characters", () => {
+    expect(matchesPattern("*.exe", "Show/x.exe.")).toBe(true);
+    expect(matchesPattern("*.exe", "Show/x.exe . ")).toBe(true);
+    expect(matchesPattern("*.exe", "Show/ｘ．ｅｘｅ")).toBe(true);
+    expect(matchesPattern("*/sample/*", "Show/Sample. /clip.mkv")).toBe(true);
+  });
+
   test("matches the full path when the pattern has a slash", () => {
     expect(matchesPattern("sample/*", "Show/sample/clip.mkv")).toBe(false);
     expect(matchesPattern("*/sample/*", "Show/sample/clip.mkv")).toBe(true);

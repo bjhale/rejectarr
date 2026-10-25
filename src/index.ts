@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { sanitize } from "./format";
 import { qbtInfo } from "./commands/qbt-info";
 import { qbtList } from "./commands/qbt-list";
 import { rulesExecute } from "./commands/rules-execute";
@@ -42,6 +43,8 @@ if (!command) {
 try {
   await command.run(args);
 } catch (err) {
-  console.error(err instanceof Error ? err.message : err);
+  // Errors can carry server responses and torrent names; keep line breaks but nothing else unsafe.
+  const message = String(err instanceof Error ? err.message : err);
+  console.error(message.split("\n").map(sanitize).join("\n"));
   process.exit(1);
 }

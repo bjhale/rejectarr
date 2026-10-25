@@ -17,8 +17,23 @@ export interface TorrentVerdict {
 /** Matches a pattern against the file name, or the full path if the pattern contains "/". */
 export function matchesPattern(pattern: string, path: string): boolean {
   const p = pattern.toLowerCase();
-  const target = (p.includes("/") ? path : path.slice(path.lastIndexOf("/") + 1)).toLowerCase();
+  const normalized = normalizePath(path);
+  const target = p.includes("/") ? normalized : normalized.slice(normalized.lastIndexOf("/") + 1);
   return new Bun.Glob(p).match(target);
+}
+
+/**
+ * Canonicalizes a torrent file path so disguised names still match: NFKC folds look-alikes such as
+ * full-width "ｘ．ｅｘｅ" to "x.exe", and trailing dots and spaces (which Windows drops, so "x.exe ."
+ * runs as "x.exe") are removed from each segment.
+ */
+export function normalizePath(path: string): string {
+  return path
+    .normalize("NFKC")
+    .toLowerCase()
+    .split("/")
+    .map((segment) => segment.replace(/[.\s]+$/, ""))
+    .join("/");
 }
 
 /** The rulesets that apply to a category, in evaluation order. */

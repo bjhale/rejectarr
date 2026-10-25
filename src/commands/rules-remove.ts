@@ -1,5 +1,5 @@
 import { qbittorrentConfig, sonarrConfig } from "../config";
-import { formatTable } from "../format";
+import { formatTable, sanitize } from "../format";
 import { QBittorrentClient } from "../qbittorrent/client";
 import { DEFAULT_RULES_PATH, loadRulesConfig } from "../rules/config";
 import { describeViolation, findViolations } from "../rules/violations";
@@ -60,7 +60,7 @@ export async function rulesRemove(args: string[]): Promise<void> {
   }
   if (unmanaged.length > 0) {
     console.log(`\nSkipping ${unmanaged.length} violating torrent(s) not in the Sonarr queue:`);
-    for (const v of unmanaged) console.log(`  ${v.torrent.hash.slice(0, 8)}  ${v.torrent.name}`);
+    for (const v of unmanaged) console.log(`  ${v.torrent.hash.slice(0, 8)}  ${sanitize(v.torrent.name)}`);
   }
   if (targets.length === 0) {
     console.log("\nNothing to remove.");
@@ -84,10 +84,10 @@ export async function rulesRemove(args: string[]): Promise<void> {
   for (const { download } of targets) {
     try {
       await sonarr.removeAndBlocklist(download.records.map((r) => r.id));
-      console.log(`Removed   ${download.hash.slice(0, 8)}  ${download.name}`);
+      console.log(`Removed   ${download.hash.slice(0, 8)}  ${sanitize(download.name)}`);
     } catch (err) {
       failed++;
-      console.error(`Failed    ${download.hash.slice(0, 8)}  ${download.name}: ${err instanceof Error ? err.message : err}`);
+      console.error(`Failed    ${download.hash.slice(0, 8)}  ${sanitize(download.name)}: ${sanitize(String(err instanceof Error ? err.message : err))}`);
     }
   }
   console.log(`\nRemoved ${targets.length - failed} of ${targets.length} download(s).`);

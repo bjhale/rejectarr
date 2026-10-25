@@ -15,6 +15,12 @@ test("resolves a unique prefix, ignoring case and whitespace", () => {
   expect(resolveHash(torrents, " E12FA0 ").name).toBe("one");
 });
 
+test("resolves a Usenet GUID with dashes", () => {
+  const guid = { hash: "f84970a3-e846-4735-a7a3-ad93dd7882f9", name: "usenet" };
+  expect(resolveHash([...torrents, guid], "f84970a3-e846-4735-a7a3-ad93dd7882f9").name).toBe("usenet");
+  expect(resolveHash([...torrents, guid], "f84970a3-e8").name).toBe("usenet");
+});
+
 test("rejects an ambiguous prefix", () => {
   expect(() => resolveHash(torrents, "e12f")).toThrow("matches 2 torrents");
 });

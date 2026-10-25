@@ -5,7 +5,8 @@ export function resolveHash<T extends { hash: string; name: string }>(
   noun = "torrent",
 ): T {
   const prefix = input.trim().toLowerCase();
-  if (!/^[0-9a-f]+$/.test(prefix)) throw new Error(`Not a valid hash: ${input}`);
+  // Torrent hashes are hex; Usenet clients such as SABnzbd use GUIDs, which add dashes.
+  if (!/^[0-9a-f][0-9a-f-]*$/.test(prefix)) throw new Error(`Not a valid hash: ${input}`);
 
   const matches = items.filter((t) => t.hash.toLowerCase().startsWith(prefix));
   if (matches.length === 0) throw new Error(`No ${noun} matches hash ${input}`);

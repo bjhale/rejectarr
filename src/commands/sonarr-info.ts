@@ -1,5 +1,5 @@
 import { sonarrConfig } from "../config";
-import { formatBytes, formatTable } from "../format";
+import { formatBytes, formatFields, formatTable, sanitize } from "../format";
 import { resolveHash } from "../resolve";
 import { SonarrClient } from "../sonarr/client";
 import { episodeCode, formatEpisodes, groupQueue, sortedEpisodes } from "../sonarr/queue";
@@ -41,10 +41,9 @@ export async function sonarrInfo(args: string[]): Promise<void> {
     ["Queue IDs", records.map((x) => x.id).join(", ")],
   ];
   if (r.errorMessage) fields.push(["Error", r.errorMessage]);
-  const labelWidth = Math.max(...fields.map(([label]) => label.length));
-  for (const [label, value] of fields) console.log(`${`${label}:`.padEnd(labelWidth + 2)}${value}`);
+  console.log(formatFields(fields));
 
-  const messages = r.statusMessages.flatMap((m) => m.messages.map((msg) => `  ${m.title}: ${msg}`));
+  const messages = r.statusMessages.flatMap((m) => m.messages.map((msg) => `  ${sanitize(m.title)}: ${sanitize(msg)}`));
   if (messages.length > 0) console.log(`\nMessages (${messages.length}):\n${messages.join("\n")}`);
 
   const episodes = sortedEpisodes(records);

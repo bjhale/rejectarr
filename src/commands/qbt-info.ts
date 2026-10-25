@@ -1,5 +1,5 @@
 import { qbittorrentConfig } from "../config";
-import { formatBytes, formatTable } from "../format";
+import { formatBytes, formatFields, formatTable } from "../format";
 import { QBittorrentClient } from "../qbittorrent/client";
 import { resolveHash } from "../resolve";
 
@@ -53,8 +53,7 @@ export async function qbtInfo(args: string[]): Promise<void> {
     ["Trackers", `${t.trackers_count} (current: ${t.tracker || "none"})`],
     ["Comment", props.comment || "-"],
   ];
-  const labelWidth = Math.max(...fields.map(([label]) => label.length));
-  for (const [label, value] of fields) console.log(`${`${label}:`.padEnd(labelWidth + 2)}${value}`);
+  console.log(formatFields(fields));
 
   console.log(`\nFiles (${files.length}):`);
   const rows = files.map((f) => [f.name, formatBytes(f.size), `${(f.progress * 100).toFixed(1)}%`]);
